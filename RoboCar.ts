@@ -60,6 +60,13 @@ namespace RoboCar {
         M4 = 9
     }
 
+    export enum enMovement{
+        forward = 0, 
+        backward = 1,
+        leftSide = 2,
+        rightSide =3
+    }
+
     function i2cwrite(addr: number, reg: number, value: number) {
         let buf = pins.createBuffer(2)
         buf[0] = reg
@@ -117,6 +124,35 @@ namespace RoboCar {
     }
     function stopMotor(index: enMotors) {
         setPwm(index, 0, 0);
+    }
+
+    function forward(RoboCarSpeed : number){
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 1)
+        pins.digitalWritePin(DigitalPin.P16, 0)
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 1)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 1)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+    }
+    function backward(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 0)
+        pins.digitalWritePin(DigitalPin.P16, 1)
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 1)
     }
 
     /**
@@ -189,7 +225,7 @@ namespace RoboCar {
         setPwm(num, 0, pwm);
     }
 
-    //% blockId=SuperBit_MotorRun block="Motor|%index|speed(-255~255) %speed"
+    //% blockId=RoboCar_MotorRun block="Motor|%index|speed(-255~255) %speed"
     //% weight=93
     //% speed.min=-255 speed.max=255
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
@@ -197,7 +233,7 @@ namespace RoboCar {
         if (!initialized) {
             initPCA9685()
         }
-        // setFreq(1000)
+        setFreq(1000)
         speed = speed * 16; // map 255 to 4096
         if (speed >= 4096) {
             speed = 4095
@@ -277,11 +313,31 @@ namespace RoboCar {
         if (!initialized) {
             initPCA9685()
         }
-
         stopMotor(enMotors.M1);
         stopMotor(enMotors.M2);
         stopMotor(enMotors.M3);
         stopMotor(enMotors.M4);
 
+    }
+
+    //% blockId=RoboCar_Movement block="Movement|%index|speed(0~255) %speed"
+    //% weight=93
+    //% speed.min=0 speed.max=255
+    // % name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function RoboCar_Movement(index : enMovement, speed : number): void{
+        if (!initialized) {
+            initPCA9685()
+        }
+        setFreq(1000)
+        speed = speed * 16; // map 255 to 4096
+        if (speed >= 4000) {
+            speed = 4000
+            
+        }
+        if (index == 0){
+            forward(speed)
+        } else if (index == 1){
+            backward(speed)
+        }
     }
 }
