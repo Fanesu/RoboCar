@@ -1,4 +1,4 @@
-//% color="#0c6333" weight=20 icon="\uf085"
+//% color="#0c6333" weight=20 icon="\uf135"
 namespace RoboCar {
     const PCA9685_ADD = 0x40
     const MODE1 = 0x00
@@ -54,10 +54,10 @@ namespace RoboCar {
     }
     
     export enum enMotors {
-        M1 = 0,
+        M1 = 8,
         M2 = 1,
-        M3 = 8,
-        M4 = 9
+        M3 = 9,
+        M4 = 0
     }
 
     export enum enMovement{
@@ -154,12 +154,40 @@ namespace RoboCar {
         pins.digitalWritePin(DigitalPin.P11, 0)
         pins.digitalWritePin(DigitalPin.P12, 1)
     }
+    function rightSide(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 0)
+        pins.digitalWritePin(DigitalPin.P16, 1)
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 1)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+    }
+    function leftSide(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 1)
+        pins.digitalWritePin(DigitalPin.P16, 0)
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 1)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 1)
+    }
 
     /**
     * *****************************************************************
      * @param index
      */
-    //% blockId=SuperBit_RGB_Program block="RGB_Program"
+    //% blockId=RoboCar_RGB_Program block="RGB_Program"
     //% weight=99
     //% blockGap=10
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
@@ -200,7 +228,7 @@ namespace RoboCar {
         }
     }
 
-    //% blockId=RoboCar_Servo block="Servo(180°)|num %num|value %value"
+    //% blockId=RoboCar_Servo block="Servo(180°)|%num|degree %value"
     //% weight=97
     //% blockGap=10
     //% num.min=1 num.max=4 value.min=0 value.max=180
@@ -212,7 +240,7 @@ namespace RoboCar {
         setPwm(num, 0, pwm);
     }
 
-    //% blockId=RoboCar_Servo2 block="Servo(270°)|num %num|value %value"
+    //% blockId=RoboCar_Servo2 block="Servo(270°)|%num|degree %value"
     //% weight=96
     //% blockGap=10
     //% num.min=1 num.max=4 value.min=0 value.max=270
@@ -225,7 +253,7 @@ namespace RoboCar {
         setPwm(num, 0, pwm);
     }
 
-    //% blockId=RoboCar_MotorRun block="Motor|%index|speed(-255~255) %speed"
+    //% blockId=RoboCar_MotorRun block="Motor|%index|speed %speed"
     //% weight=93
     //% speed.min=-255 speed.max=255
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
@@ -234,22 +262,23 @@ namespace RoboCar {
             initPCA9685()
         }
         setFreq(1000)
+        led.enable(false)
         speed = speed * 16; // map 255 to 4096
-        if (speed >= 4096) {
-            speed = 4095
+        if (speed >= 4000) {
+            speed = 4000
         }
-        if (speed <= -4096) {
-            speed = -4095
+        if (speed <= -4000) {
+            speed = -4000
         }
         if (index == 0) {
             if (speed > 0) {
                 setPwm(index, 0, speed)
-                pins.digitalWritePin(DigitalPin.P13, 0)
-                pins.digitalWritePin(DigitalPin.P14, 1)
-            } else if (speed < 0) {
-                setPwm(index, 0, -speed)
                 pins.digitalWritePin(DigitalPin.P13, 1)
                 pins.digitalWritePin(DigitalPin.P14, 0)
+            } else if (speed < 0) {
+                setPwm(index, 0, -speed)
+                pins.digitalWritePin(DigitalPin.P13, 0)
+                pins.digitalWritePin(DigitalPin.P14, 1)
             } else {
                 setPwm(index, 0, speed)
                 pins.digitalWritePin(DigitalPin.P13, 0)
@@ -260,16 +289,16 @@ namespace RoboCar {
         if (index == 1) {
             if (speed > 0) {
                 setPwm(index, 0, speed)
-                pins.digitalWritePin(DigitalPin.P15, 0)
-                pins.digitalWritePin(DigitalPin.P16, 1)
-            } else if (speed < 0) {
-                setPwm(index, 0, -speed)
                 pins.digitalWritePin(DigitalPin.P15, 1)
                 pins.digitalWritePin(DigitalPin.P16, 0)
+            } else if (speed < 0) {
+                setPwm(index, 0, -speed)
+                pins.digitalWritePin(DigitalPin.P15, 0)
+                pins.digitalWritePin(DigitalPin.P16, 1)
             } else {
                 setPwm(index, 0, speed)
-                pins.digitalWritePin(DigitalPin.P13, 0)
-                pins.digitalWritePin(DigitalPin.P14, 0)
+                pins.digitalWritePin(DigitalPin.P15, 0)
+                pins.digitalWritePin(DigitalPin.P16, 0)
             }
         }
 
@@ -320,7 +349,7 @@ namespace RoboCar {
 
     }
 
-    //% blockId=RoboCar_Movement block="Movement|%index|speed(0~255) %speed"
+    //% blockId=RoboCar_Movement block="RoboCar|%index|speed %speed"
     //% weight=93
     //% speed.min=0 speed.max=255
     // % name.fieldEditor="gridpicker" name.fieldOptions.columns=4
@@ -328,6 +357,7 @@ namespace RoboCar {
         if (!initialized) {
             initPCA9685()
         }
+        led.enable(false)
         setFreq(1000)
         speed = speed * 16; // map 255 to 4096
         if (speed >= 4000) {
@@ -338,6 +368,25 @@ namespace RoboCar {
             forward(speed)
         } else if (index == 1){
             backward(speed)
+        } else if (index == 2) {
+            leftSide(speed)
+        } else if (index == 3) {
+            rightSide(speed)
         }
+    }
+
+    //% blockId=RoboCar_AllMotorRun block="AllMotor|Motor1 speed %speed1|Motor2 speed %speed2|Motor3 speed %speed3|Motor4 speed %speed4"
+    //% weight=92
+    //% blockGap=50
+    //% speed1.min=-255 speed1.max=255
+    //% speed2.min=-255 speed2.max=255
+    //% speed3.min=-255 speed3.max=255
+    //% speed4.min=-255 speed4.max=255
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function AllMotorRun(speed1: number, speed2: number, speed3: number, speed4: number): void {
+        MotorRun(enMotors.M1, speed1);
+        MotorRun(enMotors.M2, speed2);
+        MotorRun(enMotors.M3, speed3);
+        MotorRun(enMotors.M4, speed4);
     }
 }
