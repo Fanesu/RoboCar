@@ -1,1 +1,1 @@
-<xml xmlns="https://developers.google.com/blockly/xml"><variables></variables><block type="pxt-on-start" id="YoHgHb2rwyghEz%/x=xi" x="-552" y="-333"></block></xml>
+<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="]w|OD0+Ca3F+-9KL-b9O">strip</variable><variable id="Wzu`U:PP-TK21=xly38%">range</variable><variable id="cei(@t0@{hrs9UXnW$/2">range2</variable></variables><block type="pxt-on-start" id="[QJ+(?Vso%W0RW;$?8YH" x="-129" y="114"></block><block type="device_forever" id="zFkq?eY:J6GOWs|)85r}" x="-475" y="175"></block></xml>

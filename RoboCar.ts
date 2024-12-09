@@ -22,7 +22,6 @@ namespace RoboCar {
     let yahStrip: neopixel.Strip;
 
     export enum enMusic {
-
         dadadum = 0,
         entertainer,
         prelude,
@@ -31,7 +30,6 @@ namespace RoboCar {
         ringtone,
         funk,
         blues,
-
         birthday,
         wedding,
         funereal,
@@ -45,53 +43,51 @@ namespace RoboCar {
         power_up,
         power_down
     }
-
     export enum enServo {
         S1 = 2,
         S2 = 3,
         S3 = 4,
         S4 = 5,
     }
-    
     export enum enMotors {
         M1 = 8,
         M2 = 1,
         M3 = 9,
         M4 = 0
     }
-
     export enum enMovement{
         forward = 0, 
         backward = 1,
         leftSide = 2,
-        rightSide =3
+        rightSide = 3,
+        rotateRight = 4,
+        rotateLeft = 5,
+        forwardLeft = 6,
+        forwardRight = 7,
+        backwardLeft = 8,
+        backwardRight = 9
     }
-
     function i2cwrite(addr: number, reg: number, value: number) {
         let buf = pins.createBuffer(2)
         buf[0] = reg
         buf[1] = value
         pins.i2cWriteBuffer(addr, buf)
     }
-
     function i2ccmd(addr: number, value: number) {
         let buf = pins.createBuffer(1)
         buf[0] = value
         pins.i2cWriteBuffer(addr, buf)
     }
-
     function i2cread(addr: number, reg: number) {
         pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8BE);
         let val = pins.i2cReadNumber(addr, NumberFormat.UInt8BE);
         return val;
     }
-
     function initPCA9685(): void {
         i2cwrite(PCA9685_ADD, MODE1, 0x00)
         setFreq(50);
         initialized = true
     }
-
     function setFreq(freq: number): void {
         // Constrain the frequency
         let prescaleval = 25000000;
@@ -107,7 +103,6 @@ namespace RoboCar {
         control.waitMicros(5000);
         i2cwrite(PCA9685_ADD, MODE1, oldmode | 0xa1);
     }
-
     function setPwm(channel: number, on: number, off: number): void {
         if (channel < 0 || channel > 15)
             return;
@@ -125,64 +120,176 @@ namespace RoboCar {
     function stopMotor(index: enMotors) {
         setPwm(index, 0, 0);
     }
-
     function forward(RoboCarSpeed : number){
         setPwm(enMotors.M1, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P13, 1)
-        pins.digitalWritePin(DigitalPin.P14, 0)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+
         setPwm(enMotors.M2, 0, RoboCarSpeed)
         pins.digitalWritePin(DigitalPin.P15, 1)
         pins.digitalWritePin(DigitalPin.P16, 0)
+
         setPwm(enMotors.M3, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P9, 1)
-        pins.digitalWritePin(DigitalPin.P10, 0)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 1)
+
         setPwm(enMotors.M4, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P11, 1)
-        pins.digitalWritePin(DigitalPin.P12, 0)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
     }
     function backward(RoboCarSpeed: number) {
         setPwm(enMotors.M1, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P13, 0)
-        pins.digitalWritePin(DigitalPin.P14, 1)
+        pins.digitalWritePin(DigitalPin.P9, 1)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+
         setPwm(enMotors.M2, 0, RoboCarSpeed)
         pins.digitalWritePin(DigitalPin.P15, 0)
         pins.digitalWritePin(DigitalPin.P16, 1)
+
         setPwm(enMotors.M3, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P9, 0)
-        pins.digitalWritePin(DigitalPin.P10, 1)
+        pins.digitalWritePin(DigitalPin.P11, 1)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+
         setPwm(enMotors.M4, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P11, 0)
-        pins.digitalWritePin(DigitalPin.P12, 1)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 1)
     }
     function rightSide(RoboCarSpeed: number) {
         setPwm(enMotors.M1, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P13, 1)
-        pins.digitalWritePin(DigitalPin.P14, 0)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+
         setPwm(enMotors.M2, 0, RoboCarSpeed)
         pins.digitalWritePin(DigitalPin.P15, 0)
         pins.digitalWritePin(DigitalPin.P16, 1)
+
         setPwm(enMotors.M3, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P9, 0)
-        pins.digitalWritePin(DigitalPin.P10, 1)
-        setPwm(enMotors.M4, 0, RoboCarSpeed)
         pins.digitalWritePin(DigitalPin.P11, 1)
         pins.digitalWritePin(DigitalPin.P12, 0)
+
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
     }
     function leftSide(RoboCarSpeed: number) {
         setPwm(enMotors.M1, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P13, 0)
-        pins.digitalWritePin(DigitalPin.P14, 1)
+        pins.digitalWritePin(DigitalPin.P9, 1)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+
         setPwm(enMotors.M2, 0, RoboCarSpeed)
         pins.digitalWritePin(DigitalPin.P15, 1)
         pins.digitalWritePin(DigitalPin.P16, 0)
+
         setPwm(enMotors.M3, 0, RoboCarSpeed)
-        pins.digitalWritePin(DigitalPin.P9, 1)
-        pins.digitalWritePin(DigitalPin.P10, 0)
-        setPwm(enMotors.M4, 0, RoboCarSpeed)
         pins.digitalWritePin(DigitalPin.P11, 0)
         pins.digitalWritePin(DigitalPin.P12, 1)
-    }
 
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+    }
+    function rotateRight(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 0)
+        pins.digitalWritePin(DigitalPin.P16, 1)
+
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 1)
+
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+    }
+    function rotateLeft(RoboCarSpeed: number){
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 1)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 1)
+        pins.digitalWritePin(DigitalPin.P16, 0)
+
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 1)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+    }
+    function forwardLeft(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, 0)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 1)
+        pins.digitalWritePin(DigitalPin.P16, 0)
+
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 1)
+
+        setPwm(enMotors.M4, 0, 0)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+    }
+    function forwardRight(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 1)
+
+        setPwm(enMotors.M2, 0, 0)
+        pins.digitalWritePin(DigitalPin.P15, 0)
+        pins.digitalWritePin(DigitalPin.P16, 0)
+
+        setPwm(enMotors.M3, 0, 0)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 1)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+    }
+    function backwardLeft(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P9, 1)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+
+        setPwm(enMotors.M2, 0, 0)
+        pins.digitalWritePin(DigitalPin.P15, 0)
+        pins.digitalWritePin(DigitalPin.P16, 0)
+
+        setPwm(enMotors.M3, 0, 0)
+        pins.digitalWritePin(DigitalPin.P11, 0)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+
+        setPwm(enMotors.M4, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 1)
+    }
+    function backwardRight(RoboCarSpeed: number) {
+        setPwm(enMotors.M1, 0, 0)
+        pins.digitalWritePin(DigitalPin.P9, 0)
+        pins.digitalWritePin(DigitalPin.P10, 0)
+
+        setPwm(enMotors.M2, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P15, 0)
+        pins.digitalWritePin(DigitalPin.P16, 1)
+
+        setPwm(enMotors.M3, 0, RoboCarSpeed)
+        pins.digitalWritePin(DigitalPin.P11, 1)
+        pins.digitalWritePin(DigitalPin.P12, 0)
+
+        setPwm(enMotors.M4, 0, 0)
+        pins.digitalWritePin(DigitalPin.P13, 0)
+        pins.digitalWritePin(DigitalPin.P14, 0)
+    }
     /**
     * *****************************************************************
      * @param index
@@ -192,13 +299,11 @@ namespace RoboCar {
     //% blockGap=10
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     export function RGB_Program(): neopixel.Strip {
-
         if (!yahStrip) {
             yahStrip = neopixel.create(DigitalPin.P2, 4, NeoPixelMode.RGB);
         }
         return yahStrip;
     }
-
     //% blockId=SuperBit_Music block="Music|%index"
     //% weight=98
     //% blockGap=10
@@ -227,7 +332,6 @@ namespace RoboCar {
             case enMusic.power_down: music.beginMelody(music.builtInMelody(Melodies.PowerDown), MelodyOptions.Once); break;
         }
     }
-
     //% blockId=RoboCar_Servo block="Servo(180°)|%num|degree %value"
     //% weight=97
     //% blockGap=10
@@ -239,7 +343,6 @@ namespace RoboCar {
         let pwm = us * 4096 / 20000;
         setPwm(num, 0, pwm);
     }
-
     //% blockId=RoboCar_Servo2 block="Servo(270°)|%num|degree %value"
     //% weight=96
     //% blockGap=10
@@ -252,7 +355,6 @@ namespace RoboCar {
         let pwm = us * 4096 / 20000;
         setPwm(num, 0, pwm);
     }
-
     //% blockId=RoboCar_MotorRun block="Motor|%index|speed %speed"
     //% weight=93
     //% speed.min=-255 speed.max=255
@@ -263,12 +365,12 @@ namespace RoboCar {
         }
         setFreq(1000)
         led.enable(false)
-        speed = speed * 16; // map 255 to 4096
-        if (speed >= 4000) {
-            speed = 4000
+        speed = (speed * 16)*0.7; // map 255 to 4096
+        if (speed >= 4096 * 0.7) {
+            speed = 4096 * 0.7
         }
-        if (speed <= -4000) {
-            speed = -4000
+        if (speed <= -(4096 * 0.7)) {
+            speed = -(4096 * 0.7)
         }
         if (index == 0) {
             if (speed > 0) {
@@ -285,7 +387,6 @@ namespace RoboCar {
                 pins.digitalWritePin(DigitalPin.P14, 0)
             }
         }
-
         if (index == 1) {
             if (speed > 0) {
                 setPwm(index, 0, speed)
@@ -301,7 +402,6 @@ namespace RoboCar {
                 pins.digitalWritePin(DigitalPin.P16, 0)
             }
         }
-
         if (index == 8) {
             if (speed > 0) {
                 setPwm(index, 0, speed)
@@ -317,7 +417,6 @@ namespace RoboCar {
                 pins.digitalWritePin(DigitalPin.P10, 0)
             }
         }
-
         if (index == 9) {
             if (speed > 0) {
                 setPwm(index, 0, speed)
@@ -334,7 +433,6 @@ namespace RoboCar {
             }
         }
     }
-
     //% blockId=RoboCar_MotorStopAll block="Motor Stop All"
     //% weight=91
     //% blockGap=50
@@ -348,7 +446,6 @@ namespace RoboCar {
         stopMotor(enMotors.M4);
 
     }
-
     //% blockId=RoboCar_Movement block="RoboCar|%index|speed %speed"
     //% weight=93
     //% speed.min=0 speed.max=255
@@ -359,10 +456,9 @@ namespace RoboCar {
         }
         led.enable(false)
         setFreq(1000)
-        speed = speed * 16; // map 255 to 4096
-        if (speed >= 4000) {
-            speed = 4000
-            
+        speed = (speed * 16) * 0.7; // map 255 to 4096
+        if (speed >= 4096 * 0.7) {
+            speed = 4096 * 0.7
         }
         if (index == 0){
             forward(speed)
@@ -372,9 +468,21 @@ namespace RoboCar {
             leftSide(speed)
         } else if (index == 3) {
             rightSide(speed)
+        } else if (index == 4) {
+            rotateRight(speed)
+        }else if (index == 5){
+            rotateLeft(speed)
+        } else if (index == 6) {
+            forwardLeft(speed)
+        } else if (index == 7) {
+            forwardRight(speed)
+        } else if (index == 8){
+            backwardLeft(speed)
+        } else if (index == 9) {
+            backwardRight(speed)
         }
+        
     }
-
     //% blockId=RoboCar_AllMotorRun block="AllMotor|Motor1 speed %speed1|Motor2 speed %speed2|Motor3 speed %speed3|Motor4 speed %speed4"
     //% weight=92
     //% blockGap=50
